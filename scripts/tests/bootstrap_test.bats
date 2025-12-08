@@ -169,6 +169,63 @@ teardown() {
     [ "$status" -eq 0 ]
 }
 
+@test "script has install_java function" {
+    run grep -q "install_java()" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script has check_java_version function" {
+    run grep -q "check_java_version()" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script requires Java 17 or higher" {
+    run grep -q "17" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+    run grep -qi "java.*17\|openjdk.*17\|openjdk@17" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script installs Java via Homebrew on macOS" {
+    run grep -q "brew install openjdk@17" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script installs Java via apt-get on Debian/Ubuntu" {
+    run grep -q "apt-get.*openjdk-17-jdk" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script installs Java via dnf/yum on RedHat/Fedora" {
+    run grep -q "dnf install.*java-17-openjdk\|yum install.*java-17-openjdk" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script installs Java via pacman on Arch Linux" {
+    run grep -q "pacman.*jdk17-openjdk" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script installs Java via Chocolatey or winget on Windows" {
+    run grep -q "choco install.*openjdk17\|winget install.*OpenJDK" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script sets JAVA_HOME after installation" {
+    run grep -q "JAVA_HOME" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script creates symlink for Java on macOS" {
+    run grep -q "JavaVirtualMachines" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script provides manual install instructions for Java" {
+    run grep -q "adoptium.net" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
 @test "script checks for mvn prerequisite" {
     run grep -q "mvn" "$BOOTSTRAP_SCRIPT"
     [ "$status" -eq 0 ]
@@ -179,8 +236,25 @@ teardown() {
     [ "$status" -eq 0 ]
 }
 
-@test "script checks for cqlsh prerequisite" {
-    run grep -q "cqlsh" "$BOOTSTRAP_SCRIPT"
+@test "script checks for ycqlsh or cqlsh prerequisite" {
+    run grep -q "ycqlsh\|cqlsh" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script prefers ycqlsh over cqlsh" {
+    # Verify ycqlsh is checked first (preferred)
+    run grep -q 'command -v ycqlsh' "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script uses CQLSH_CMD variable for CQL operations" {
+    run grep -q 'CQLSH_CMD' "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script sets CQLSH_NO_BUNDLED to avoid library conflicts" {
+    # This avoids incompatibility between bundled six 1.12.0 and Python 3.12+
+    run grep -q 'CQLSH_NO_BUNDLED=1' "$BOOTSTRAP_SCRIPT"
     [ "$status" -eq 0 ]
 }
 
