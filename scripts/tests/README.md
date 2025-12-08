@@ -69,7 +69,7 @@ The test suite covers the following areas:
 | Argument Parsing | Command-line option handling and error cases | 2 |
 | Script Structure | Presence of required functions | 8 |
 | Default Values | Correct initialization of variables | 3 |
-| Prerequisite Checks | Detection of required tools (java, mvn, python3, etc.) | 5 |
+| Prerequisite Checks | Detection and installation of required tools (Java 17, mvn, python3, ycqlsh/cqlsh, psql) | 19 |
 | Exit Code Mapping | Proper error code descriptions | 4 |
 | YugabyteDB Mode | Docker and native installation functions | 4 |
 | Microservice Startup | All 6 microservices are started | 6 |
@@ -82,7 +82,7 @@ The test suite covers the following areas:
 | Port Configuration | Correct ports for all services | 8 |
 | Frontend URL Display | Clickable URL with OSC 8 escape sequence | 4 |
 
-**Total: 69 tests**
+**Total: 83 tests**
 
 ## Test File Structure
 

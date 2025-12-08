@@ -11,8 +11,9 @@
 #   ./bootstrap.sh --help              # Show help
 
 # Configuration
-LOG_FILE="bootstrap.log"
-BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+BASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"  # Project root is one level up from scripts/
+LOG_FILE="$BASE_DIR/bootstrap.log"
 MISSING_PREREQS=()
 INTERACTIVE=true
 YUGABYTE_MODE="docker"  # Default: docker
@@ -237,29 +238,97 @@ install_package() {
     esac
 }
 
-# Install Java
+# Install Java 17 (required version for this application)
 install_java() {
-    log_message "INFO" "Installing Java..."
+    log_message "INFO" "Installing Java 17..."
+    echo "Installing OpenJDK 17..."
+
     case "$OS_TYPE" in
         macos)
+            # Install OpenJDK 17 via Homebrew
             brew install openjdk@17 2>&1 | tee -a "$LOG_FILE"
-            export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
+
+            # Create symlink so system java wrappers find this JDK
+            if [ -d "/opt/homebrew/opt/openjdk@17" ]; then
+                sudo ln -sfn /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk 2>/dev/null || true
+                export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
+                export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
+                log_message "INFO" "Java 17 installed via Homebrew and symlinked"
+            elif [ -d "/usr/local/opt/openjdk@17" ]; then
+                # Intel Mac path
+                sudo ln -sfn /usr/local/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk 2>/dev/null || true
+                export PATH="/usr/local/opt/openjdk@17/bin:$PATH"
+                export JAVA_HOME="/usr/local/opt/openjdk@17"
+                log_message "INFO" "Java 17 installed via Homebrew (Intel) and symlinked"
+            fi
             ;;
         linux-debian)
-            sudo apt-get update && sudo apt-get install -y openjdk-17-jdk 2>&1 | tee -a "$LOG_FILE"
+            sudo apt-get update 2>&1 | tee -a "$LOG_FILE"
+            sudo apt-get install -y openjdk-17-jdk 2>&1 | tee -a "$LOG_FILE"
+            # Set JAVA_HOME
+            export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
+            [ -d "$JAVA_HOME" ] || export JAVA_HOME="/usr/lib/jvm/java-17-openjdk"
+            log_message "INFO" "Java 17 installed via apt-get"
             ;;
         linux-redhat)
-            sudo dnf install -y java-17-openjdk-devel 2>&1 | tee -a "$LOG_FILE" || \
-            sudo yum install -y java-17-openjdk-devel 2>&1 | tee -a "$LOG_FILE"
+            if command -v dnf &> /dev/null; then
+                sudo dnf install -y java-17-openjdk-devel 2>&1 | tee -a "$LOG_FILE"
+            else
+                sudo yum install -y java-17-openjdk-devel 2>&1 | tee -a "$LOG_FILE"
+            fi
+            export JAVA_HOME="/usr/lib/jvm/java-17-openjdk"
+            log_message "INFO" "Java 17 installed via dnf/yum"
             ;;
         linux-arch)
             sudo pacman -S --noconfirm jdk17-openjdk 2>&1 | tee -a "$LOG_FILE"
+            export JAVA_HOME="/usr/lib/jvm/java-17-openjdk"
+            log_message "INFO" "Java 17 installed via pacman"
             ;;
         windows)
-            choco install -y openjdk17 2>&1 | tee -a "$LOG_FILE" || \
-            winget install --accept-package-agreements Microsoft.OpenJDK.17 2>&1 | tee -a "$LOG_FILE"
+            # Try Chocolatey first, then winget
+            if command -v choco &> /dev/null; then
+                choco install -y openjdk17 2>&1 | tee -a "$LOG_FILE"
+                log_message "INFO" "Java 17 installed via Chocolatey"
+            elif command -v winget &> /dev/null; then
+                winget install --accept-package-agreements --accept-source-agreements Microsoft.OpenJDK.17 2>&1 | tee -a "$LOG_FILE"
+                log_message "INFO" "Java 17 installed via winget"
+            else
+                log_message "ERROR" "Neither Chocolatey nor winget available. Please install Java 17 manually."
+                echo "ERROR: Please install Java 17 manually from https://adoptium.net/"
+                return 1
+            fi
+            ;;
+        *)
+            log_message "ERROR" "Unsupported OS for Java installation: $OS_TYPE"
+            echo "ERROR: Please install Java 17 manually from https://adoptium.net/"
+            return 1
             ;;
     esac
+
+    return 0
+}
+
+# Check if Java version is 17 or higher
+check_java_version() {
+    if ! command -v java &> /dev/null; then
+        return 1
+    fi
+
+    # Get Java version number
+    java_version=$(java -version 2>&1 | head -n 1 | sed -E 's/.*"([0-9]+)\.?.*/\1/')
+
+    if [ -z "$java_version" ]; then
+        # Try alternate parsing for different java -version formats
+        java_version=$(java -version 2>&1 | head -n 1 | grep -oE '[0-9]+' | head -1)
+    fi
+
+    if [ -n "$java_version" ] && [ "$java_version" -ge 17 ] 2>/dev/null; then
+        log_message "INFO" "Java version $java_version detected (>= 17 required)"
+        return 0
+    else
+        log_message "WARNING" "Java version $java_version detected, but Java 17+ is required"
+        return 1
+    fi
 }
 
 # Install Maven
@@ -640,18 +709,29 @@ case "$OS_TYPE" in
         ;;
 esac
 
-# Check for Java 17
+# Check for Java 17+
 if ! command -v java &> /dev/null; then
     log_message "WARNING" "Java not found. Attempting to install OpenJDK 17..."
     install_java
+elif ! check_java_version; then
+    log_message "WARNING" "Java version is below 17. Attempting to install OpenJDK 17..."
+    install_java
 fi
 
-# Verify Java version
+# Verify Java is installed and version is correct
 if command -v java &> /dev/null; then
-    java_version=$(java -version 2>&1 | head -n 1)
-    log_message "INFO" "Java version: $java_version"
+    java_version_full=$(java -version 2>&1 | head -n 1)
+    log_message "INFO" "Java version: $java_version_full"
+    echo "  Java: $java_version_full"
+
+    if ! check_java_version; then
+        log_message "ERROR" "Java 17 or higher is required. Current version does not meet requirements."
+        echo "ERROR: Java 17+ is required. Please install from https://adoptium.net/"
+        exit 1
+    fi
 else
-    log_message "ERROR" "Java installation failed."
+    log_message "ERROR" "Java installation failed. Please install Java 17 manually."
+    echo "ERROR: Java 17 is required. Please install from https://adoptium.net/"
     exit 1
 fi
 
@@ -672,11 +752,25 @@ if ! command -v python3 &> /dev/null; then
     install_python
 fi
 
-# Check for cqlsh (Cassandra Query Language Shell)
-if ! command -v cqlsh &> /dev/null; then
-    log_message "WARNING" "cqlsh not found. Attempting to install via pip..."
-    echo "Installing cqlsh via pip..."
-    pip3 install cqlsh 2>&1 | tee -a "$LOG_FILE"
+# Check for ycqlsh or cqlsh (Cassandra Query Language Shell)
+# Prefer ycqlsh (YugabyteDB's bundled version) over cqlsh to avoid version warnings
+# Install Python dependencies required by ycqlsh
+log_message "INFO" "Installing Python dependencies for CQL shell..."
+pip3 install six cassandra-driver geomet &>/dev/null || true
+
+# Set CQLSH_NO_BUNDLED to avoid using outdated bundled libraries (six 1.12.0)
+# that are incompatible with Python 3.12+
+export CQLSH_NO_BUNDLED=1
+
+if command -v ycqlsh &> /dev/null; then
+    CQLSH_CMD="ycqlsh"
+    log_message "INFO" "Using YugabyteDB's ycqlsh for CQL operations"
+elif command -v cqlsh &> /dev/null; then
+    CQLSH_CMD="cqlsh"
+    log_message "WARNING" "Using generic cqlsh - may show version warnings with YugabyteDB"
+else
+    log_message "WARNING" "Neither ycqlsh nor cqlsh found. Will attempt to use ycqlsh after YugabyteDB install."
+    CQLSH_CMD="ycqlsh"  # Default to ycqlsh, will be available after YugabyteDB native install
 fi
 
 # Check for psql (PostgreSQL client)
@@ -725,14 +819,25 @@ fi
 
 # Verify YugabyteDB connectivity
 echo "Verifying YugabyteDB connectivity..."
-if command -v cqlsh &> /dev/null; then
-    if cqlsh -e "DESCRIBE KEYSPACES;" 2>/dev/null; then
-        log_message "INFO" "YugabyteDB YCQL connection verified"
-        echo "  YCQL (Cassandra) connection: OK"
+
+# Re-check for ycqlsh after YugabyteDB installation (native install provides it)
+if command -v ycqlsh &> /dev/null; then
+    CQLSH_CMD="ycqlsh"
+elif command -v cqlsh &> /dev/null; then
+    CQLSH_CMD="cqlsh"
+fi
+
+if command -v $CQLSH_CMD &> /dev/null; then
+    if $CQLSH_CMD -e "SELECT now() FROM system.local;" &>/dev/null; then
+        log_message "INFO" "YugabyteDB YCQL connection verified using $CQLSH_CMD"
+        echo "  YCQL (Cassandra) connection: OK (using $CQLSH_CMD)"
     else
         log_message "WARNING" "Could not connect to YugabyteDB YCQL on localhost:9042"
         echo "  WARNING: Could not connect to YCQL on localhost:9042"
     fi
+else
+    log_message "WARNING" "No CQL shell found (ycqlsh or cqlsh)"
+    echo "  WARNING: No CQL shell available"
 fi
 
 if command -v psql &> /dev/null; then
@@ -780,9 +885,9 @@ echo "Step 1: Initializing YugabyteDB schemas..."
 echo "=========================================="
 log_message "INFO" "=== STEP 1: DATABASE INITIALIZATION ==="
 
-# Create CQL schema
+# Create CQL schema using ycqlsh (preferred) or cqlsh
 echo "Creating CQL schema..."
-run_command "Create CQL schema (cqlsh -f schema.cql)" "cqlsh -f schema.cql" "$BASE_DIR/resources"
+run_command "Create CQL schema ($CQLSH_CMD -f schema.cql)" "$CQLSH_CMD -f schema.cql" "$BASE_DIR/resources"
 if [ $? -ne 0 ]; then
     log_message "WARNING" "CQL schema creation failed. Check $LOG_FILE for details."
     echo "WARNING: CQL schema creation failed."
