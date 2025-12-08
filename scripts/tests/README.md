@@ -80,8 +80,9 @@ The test suite covers the following areas:
 | Package Managers | Support for apt, yum, dnf, brew | 3 |
 | Error Handling | Exit codes and missing prerequisites | 3 |
 | Port Configuration | Correct ports for all services | 8 |
+| Frontend URL Display | Clickable URL with OSC 8 escape sequence | 4 |
 
-**Total: 65 tests**
+**Total: 69 tests**
 
 ## Test File Structure
 

@@ -425,3 +425,28 @@ teardown() {
     run grep -q "5433" "$BOOTSTRAP_SCRIPT"
     [ "$status" -eq 0 ]
 }
+
+# =============================================================================
+# FRONTEND URL DISPLAY TESTS
+# =============================================================================
+
+@test "script displays prominent FRONTEND URL section" {
+    run grep -q "FRONTEND URL" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script uses printf for clickable URL" {
+    run grep -q 'printf.*http://localhost:8080' "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script uses OSC 8 escape sequence for hyperlink" {
+    # OSC 8 is the escape sequence for clickable hyperlinks in terminals
+    run grep -q '\\033\]8;;' "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "script displays click to open hint" {
+    run grep -qi "click to open" "$BOOTSTRAP_SCRIPT"
+    [ "$status" -eq 0 ]
+}
