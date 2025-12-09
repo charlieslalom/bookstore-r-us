@@ -1,6 +1,6 @@
 # Yugastore in Java
 
-![Homepage](docs/home.png)
+![Homepage](assets/images/home.png)
 This is an implementation of a sample ecommerce app. This microservices-based retail marketplace or eCommerce app is composed of **microservices written in Spring (Java)**, a **UI based on React** and **YugabyteDB as the [distributed SQL](https://www.yugabyte.com/tech/distributed-sql/) database**.
 
 If you're using this demo app, please :star: this repository! We appreciate your support.
@@ -220,20 +220,20 @@ Once all services are registered, you can browse the marketplace app at [http://
 
 
 ### Home
-![Home Page](docs/home.png)
+![Home Page](assets/images/home.png)
 
 ### Product Category Page
 
-![Product Category](docs/product-category.png)
+![Product Category](assets/images/product-category.png)
 
 ### Product Detail Page
 
-![Product Page](docs/product.png)
+![Product Page](assets/images/product.png)
 
 ### Car
 
-![Cart](docs/cart.png)
+![Cart](assets/images/cart.png)
 
 ## Checkout
 
-![Checkout](docs/checkout.png)
+![Checkout](assets/images/checkout.png)
