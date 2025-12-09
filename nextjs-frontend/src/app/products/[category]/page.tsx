@@ -14,14 +14,15 @@ async function getProducts(category: string) {
     }
 }
 
-export default async function CategoryPage({ params }: { params: { category: string } }) {
-    const products = await getProducts(params.category);
+export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+    const { category } = await params;
+    const products = await getProducts(category);
 
     return (
         <div className="flex min-h-screen flex-col">
             <Navbar />
             <main className="container py-8 flex-1">
-                <h1 className="text-3xl font-bold tracking-tight mb-8 capitalize">{params.category}</h1>
+                <h1 className="text-3xl font-bold tracking-tight mb-8 capitalize">{category}</h1>
 
                 {products.length === 0 ? (
                     <div className="text-center py-20 text-muted-foreground">
