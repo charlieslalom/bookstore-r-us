@@ -267,26 +267,23 @@ class SpecificationVerifier:
         self.principles: List[Principle] = []
         self.specifications: List[SpecificationItem] = []
     
-    def load_documents(self, human_inputs: List[Path], requirements_docs: List[Path], 
-                      constitution: Path, specification: Path):
-        """Load all input documents"""
+    def load_documents(self, input_files: List[Path], specification: Path):
+        """Load all input documents from a single folder"""
         parser = DocumentParser()
         
-        # Load human input requirements
-        for doc in human_inputs:
+        # Process all input files - extract both requirements and principles from each
+        for doc in input_files:
             lines = parser.parse_file(doc)
-            reqs = parser.extract_requirements(lines, f"HUMAN_INPUT:{doc.name}")
-            self.requirements.extend(reqs)
-        
-        # Load reverse-engineered requirements
-        for doc in requirements_docs:
-            lines = parser.parse_file(doc)
-            reqs = parser.extract_requirements(lines, f"REV_ENG:{doc.name}")
-            self.requirements.extend(reqs)
-        
-        # Load constitution/principles
-        lines = parser.parse_file(constitution)
-        self.principles = parser.extract_principles(lines)
+            
+            # Try to extract requirements
+            reqs = parser.extract_requirements(lines, f"INPUT:{doc.name}")
+            if reqs:
+                self.requirements.extend(reqs)
+            
+            # Try to extract principles
+            principles = parser.extract_principles(lines)
+            if principles:
+                self.principles.extend(principles)
         
         # Load specification
         lines = parser.parse_file(specification)
@@ -743,50 +740,84 @@ class SpecificationVerifier:
         return "\n".join(report)
 
 
+def scan_input_folder(folder_path: Path) -> List[Path]:
+    """Scan folder recursively for all supported document files"""
+    supported_extensions = {'.txt', '.md', '.markdown', '.rst', '.text'}
+    files = []
+    
+    if not folder_path.exists():
+        print(f"Error: Input folder not found: {folder_path}", file=sys.stderr)
+        sys.exit(1)
+    
+    if not folder_path.is_dir():
+        print(f"Error: Input path must be a directory: {folder_path}", file=sys.stderr)
+        sys.exit(1)
+    
+    # Find all supported files
+    for ext in supported_extensions:
+        files.extend(folder_path.rglob(f'*{ext}'))
+    
+    # Also include files without extension
+    for file in folder_path.rglob('*'):
+        if file.is_file() and not file.suffix and not file.name.startswith('.'):
+            files.append(file)
+    
+    # Sort for consistent ordering
+    files = sorted(set(files))
+    
+    if not files:
+        print(f"Error: No supported files found in {folder_path}", file=sys.stderr)
+        print(f"Supported extensions: {', '.join(supported_extensions)}", file=sys.stderr)
+        sys.exit(1)
+    
+    return files
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Adversarial Specification Verification Tool',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s --human-input input1.txt input2.txt \\
-           --requirements reqs.txt \\
-           --constitution principles.txt \\
-           --specification spec.txt
+  %(prog)s --input docs/requirements/ --specification docs/spec.md
 
-  %(prog)s -i inputs/ -r reqs/ -c constitution.txt -s spec.md --output report.txt
+  %(prog)s --input inputs/ --specification spec.txt --output report.txt
+
+  %(prog)s --input /path/to/inputs/ --specification spec.md --json
         """
     )
     
-    parser.add_argument('-i', '--human-input', nargs='+', required=True,
-                       help='Human input documents (one or more files)')
-    parser.add_argument('-r', '--requirements', nargs='+', required=True,
-                       help='Reverse-engineered requirements documents')
-    parser.add_argument('-c', '--constitution', required=True,
-                       help='Constitution/guiding principles document')
-    parser.add_argument('-s', '--specification', required=True,
-                       help='Specification document to verify')
-    parser.add_argument('-o', '--output', help='Output report file (default: stdout)')
+    parser.add_argument('--input', required=True,
+                       help='Input folder containing all source documents (requirements, principles, etc.)')
+    parser.add_argument('--specification', required=True,
+                       help='Specification document to verify (file)')
+    parser.add_argument('--output', help='Output report file (default: stdout)')
     parser.add_argument('--json', action='store_true',
                        help='Output violations in JSON format')
     
     args = parser.parse_args()
     
-    # Convert paths
-    human_inputs = [Path(p) for p in args.human_input]
-    requirements = [Path(p) for p in args.requirements]
-    constitution = Path(args.constitution)
-    specification = Path(args.specification)
+    # Scan input folder for all files
+    input_folder = Path(args.input)
+    print(f"Scanning input folder: {input_folder}")
+    all_input_files = scan_input_folder(input_folder)
+    print(f"Found {len(all_input_files)} file(s)")
     
-    # Verify files exist
-    for filepath in human_inputs + requirements + [constitution, specification]:
-        if not filepath.exists():
-            print(f"Error: File not found: {filepath}", file=sys.stderr)
-            sys.exit(1)
+    # Verify specification exists and is a file
+    specification = Path(args.specification)
+    if not specification.exists():
+        print(f"Error: Specification file not found: {specification}", file=sys.stderr)
+        sys.exit(1)
+    if not specification.is_file():
+        print(f"Error: Specification must be a file, not a directory: {specification}", file=sys.stderr)
+        sys.exit(1)
+    
+    print(f"Specification: {specification.name}")
+    print()
     
     # Run verification
     verifier = SpecificationVerifier()
-    verifier.load_documents(human_inputs, requirements, constitution, specification)
+    verifier.load_documents(all_input_files, specification)
     verifier.verify()
     
     # Generate report
