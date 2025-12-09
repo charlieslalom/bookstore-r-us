@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 from typing import List
-from ..database import get_session
-from ..models import ProductMetadata, ProductRanking
+from database import get_session
+from models import ProductMetadata, ProductRanking
 
 router = APIRouter(prefix="/products-microservice", tags=["products"])
 
