@@ -5,22 +5,27 @@ import { Badge } from "@/components/ui/badge"
 import { Star } from "lucide-react"
 
 export interface Product {
-    id: string | { asin: string }
+    id?: string | { asin: string }
+    asin?: string
     title: string
     price: number
-    imUrl: string
+    imUrl?: string
+    imurl?: string
     category: string
 }
 
 export function ProductCard({ product }: { product: Product }) {
-    const asin = typeof product.id === 'string' ? product.id : product.id.asin
+    // Handle both direct asin and nested id.asin formats
+    const asin = product.asin || (typeof product.id === 'string' ? product.id : product.id?.asin) || ''
+    // Handle both imUrl and imurl (lowercase from Python API)
+    const imageUrl = product.imUrl || product.imurl || ''
 
     return (
         <Card className="flex flex-col h-full overflow-hidden transition-all hover:border-primary/50 rounded-xl">
             <Link href={`/product/${asin}`} className="flex-1">
                 <div className="aspect-[3/4] overflow-hidden relative group bg-secondary">
                     <img
-                        src={product.imUrl}
+                        src={imageUrl}
                         alt={product.title}
                         className="object-cover w-full h-full transition-transform group-hover:scale-105"
                     />

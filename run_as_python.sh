@@ -106,6 +106,32 @@ pip3 install uvicorn fastapi sqlmodel psycopg2-binary httpx py-eureka-client pyt
 }
 echo -e "${GREEN}Python dependencies OK${NC}"
 
+# Initialize database with tables and sample data
+echo -e "\n${YELLOW}Initializing database...${NC}"
+
+# Check if database is accessible using Python
+if ! python3 -c "import psycopg2; psycopg2.connect('$DATABASE_URL').close()" 2>/dev/null; then
+    echo -e "${RED}Cannot connect to database at $DATABASE_URL${NC}"
+    echo -e "${YELLOW}Please ensure PostgreSQL/YugabyteDB is running on port $DB_PORT${NC}"
+    exit 1
+fi
+echo -e "${GREEN}Database connection verified${NC}"
+
+# Run data loader script
+cd "$SCRIPT_DIR"
+if [ -f "scripts/load_data_postgres.py" ]; then
+    echo "Running database migrations and loading sample data..."
+    DATABASE_URL="$DATABASE_URL" python3 scripts/load_data_postgres.py
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Database initialization complete${NC}"
+    else
+        echo -e "${RED}Database initialization failed${NC}"
+        exit 1
+    fi
+else
+    echo -e "${YELLOW}Warning: Data loader script not found, skipping database setup${NC}"
+fi
+
 # Kill any existing services on our ports
 echo -e "\n${YELLOW}Cleaning up existing services...${NC}"
 kill_port $API_GATEWAY_PORT

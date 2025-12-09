@@ -63,7 +63,7 @@ export default async function Home() {
                 </Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {books.map((p: any) => <ProductCard key={p.id.asin || p.id} product={p} />)}
+                {books.map((p: any) => <ProductCard key={p.asin || p.id?.asin || p.id} product={p} />)}
               </div>
             </div>
           )}
@@ -77,7 +77,7 @@ export default async function Home() {
                 </Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {music.map((p: any) => <ProductCard key={p.id.asin || p.id} product={p} />)}
+                {music.map((p: any) => <ProductCard key={p.asin || p.id?.asin || p.id} product={p} />)}
               </div>
             </div>
           )}
@@ -91,7 +91,7 @@ export default async function Home() {
                 </Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {electronics.map((p: any) => <ProductCard key={p.id.asin || p.id} product={p} />)}
+                {electronics.map((p: any) => <ProductCard key={p.asin || p.id?.asin || p.id} product={p} />)}
               </div>
             </div>
           )}
