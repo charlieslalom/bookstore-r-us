@@ -4,15 +4,25 @@ This directory contains example documents that demonstrate the Specification Ver
 
 ## Quick Start
 
+### Basic Verifier
 ```bash
 ./run_demo.sh
 ```
 
-This will run the verifier against the example documents and show you typical output with violations.
+### Enhanced Verifier (with Deep Analysis)
+```bash
+# Terminal 1: Start mock API server
+python3 mock_source_api.py
+
+# Terminal 2: Run demo
+./run_demo_enhanced.sh
+```
+
+The enhanced version fetches original source documents (transcripts, emails, design docs) when it finds violations!
 
 ## Example Documents
 
-### Input Documents
+### Input Documents (Basic)
 
 1. **`human_input.txt`** - User stories and stakeholder requirements
    - Search and discovery requirements

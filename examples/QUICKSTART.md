@@ -141,3 +141,4 @@ cat violations.json | jq -r '.[] | select(.category=="COVERAGE") | .evidence[]'
 - Customize for your project's needs
 - Run iteratively during specification development
 
+

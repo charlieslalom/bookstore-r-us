@@ -347,3 +347,4 @@ Same as the parent project (bookstore-r-us).
 **Philosophy**: Better to catch issues early than fix bugs later  
 **Approach**: Strict, thorough, and uncompromising
 
+

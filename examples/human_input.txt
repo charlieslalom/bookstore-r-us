@@ -53,3 +53,4 @@ ACCESSIBILITY:
 - The UI should be accessible to screen readers
 - Color contrast needs to meet WCAG 2.1 AA standards
 
+
