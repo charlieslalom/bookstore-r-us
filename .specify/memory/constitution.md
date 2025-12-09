@@ -4,40 +4,21 @@
 
 ---
 
-## **1. Purpose and Scope**
+## **1. Core Values & Architectural Principles**
 
-This constitution establishes the **foundational principles, design philosophy, engineering rules, governance, and SDLC workflow** for building and operating a **cloud-native, scalable, resilient microservices-based e-commerce platform**.
-The system supports:
-
-* Online bookstore shopping experience
-* Product catalog and search
-* Cart and checkout
-* Order lifecycle & fulfillment
-* Identity, authentication & authorization
-* Payment routing (future/optional)
-* Inventory and data storage
-* API gateway & routing
-* Observability, resilience, performance
-
-This constitution is **technology-agnostic**, forward-looking, and supports **AI-assisted, spec-driven development workflows**, ensuring durable engineering discipline and predictable delivery.
-
----
-
-## **2. Core Values & Architectural Principles**
-
-### **2.1 Cloud-Native First**
+### **1.1 Cloud-Native First**
 
 * All components must be designed for **horizontal scalability**, **stateless compute**, and **managed cloud services**.
 * Prefer serverless or containerized workloads over self-managed infrastructure.
 * Minimize operational burden by adopting managed services (databases, queues, identity providers).
 
-### **2.2 Microservices with Clear Boundaries**
+### **1.2 Microservices with Clear Boundaries**
 
 * Each service owns a **single, cohesive domain** (e.g., Catalog, Cart, Checkout, Authentication).
 * Services communicate through **well-defined APIs**; avoid implicit dependencies.
 * No shared mutable database across services.
 
-### **2.3 API Contract Stability**
+### **1.3 API Contract Stability**
 
 * RESTful APIs must have:
 
@@ -46,24 +27,24 @@ This constitution is **technology-agnostic**, forward-looking, and supports **AI
   * Strong schema validation
 * Breaking changes require proper version rollouts.
 
-### **2.4 Fail-Fast, Safe-to-Fail**
+### **1.4 Fail-Fast, Safe-to-Fail**
 
 * Services should detect invalid states early and fail gracefully.
 * Degradation modes must protect user experience (e.g., cached catalog if upstream fails).
 
-### **2.5 Test-First, Test-Always**
+### **1.5 Test-First, Test-Always**
 
 * No code is merged without automated tests.
 * Unit, integration, contract, and load tests are required.
 * APIs require machine-readable contracts enabling automated tests.
 
-### **2.6 Security & Privacy by Default**
+### **1.6 Security & Privacy by Default**
 
 * Zero-trust architecture.
 * Enforce authentication, authorization, input validation, and output encoding.
 * No PII or sensitive customer data stored without encryption in transit and at rest.
 
-### **2.7 Observability as a First-Class Citizen**
+### **1.7 Observability as a First-Class Citizen**
 
 * Every service emits:
 
@@ -74,80 +55,9 @@ This constitution is **technology-agnostic**, forward-looking, and supports **AI
 
 ---
 
-## **3. Functional Requirements (High-Level)**
+## **2. System Architecture Principles**
 
-### **3.1 Product Catalog**
-
-* Browse/search books
-* Detail pages with pricing, metadata, availability
-* Support category filtering & pagination
-
-### **3.2 Shopping Cart**
-
-* Add/remove/update items
-* Persist carts for authenticated users
-* Stateless operations backed by durable storage
-
-### **3.3 Checkout & Order Processing**
-
-* Tax/shipping calculation
-* Order summary
-* Payment flow (future)
-* Order creation & order tracking lifecycle
-
-### **3.4 User Authentication**
-
-* Support login/signup
-* Token-based session management
-* Integrate with cloud identity provider (Cognito/Okta/etc.)
-
-### **3.5 System Management APIs**
-
-* Health checks
-* Service discovery
-* Operational endpoints
-
----
-
-## **4. Non-Functional Requirements**
-
-### **4.1 Performance**
-
-* API response time target: ≤ 200 ms at P95
-* Catalog & cart endpoints must support burst traffic
-
-### **4.2 Scalability**
-
-* Horizontal scaling for compute and storage
-* Services must avoid single points of failure
-
-### **4.3 Reliability**
-
-* SLO: 99.9% uptime
-* Redundancy for critical services
-* Graceful degradation & fallback strategies
-
-### **4.4 Resilience**
-
-* Circuit breakers, retries, backoff strategies
-* Rate limiting and API quota enforcement
-
-### **4.5 Accessibility (for UI)**
-
-* WCAG AA compliance
-* Keyboard navigation support
-* Alternative text for images
-
-### **4.6 Internationalization (future)**
-
-* Multi-language content
-* Configurable currency and locale formats
-
----
-
-## **5. System Architecture Principles**
-
-### **5.1 Front-End (React or modern framework)**
+### **2.1 Front-End (React or modern framework)**
 
 * Modular components
 * API-driven UI
@@ -155,26 +65,26 @@ This constitution is **technology-agnostic**, forward-looking, and supports **AI
 * Strong and consistent UX patterns
 * Do not embed business logic in the UI layer
 
-### **5.2 API Gateway**
+### **2.2 API Gateway**
 
 * Single entry point for all API consumers
 * Handles routing, rate limiting, request validation
 * Should enforce authentication before forwarding requests
 
-### **5.3 Service Discovery**
+### **2.3 Service Discovery**
 
 * Each service must register itself
 * Health checks determine routing eligibility
 * Prefer managed service discovery (cloud-native)
 
-### **5.4 Backend Microservices**
+### **2.4 Backend Microservices**
 
 * Stateless compute
 * Clear ownership of business capability
 * Storage abstraction: repository/persistence layer
 * Domain models with explicit boundaries
 
-### **5.5 Data Storage**
+### **2.5 Data Storage**
 
 * Based on domain needs: SQL or NoSQL
 * Services own their data
@@ -183,9 +93,9 @@ This constitution is **technology-agnostic**, forward-looking, and supports **AI
 
 ---
 
-## **6. SDLC & AI-Enabled Engineering Workflow**
+## **3. SDLC & AI-Enabled Engineering Workflow**
 
-### **6.1 Spec-Driven Development**
+### **3.1 Spec-Driven Development**
 
 All code development begins with:
 
@@ -196,7 +106,7 @@ All code development begins with:
 
 No coding starts without an approved spec.
 
-### **6.2 AI-Assisted Engineering (LLM + Spec-Driven)**
+### **3.2 AI-Assisted Engineering (LLM + Spec-Driven)**
 
 LLM participation includes:
 
@@ -209,13 +119,13 @@ LLM participation includes:
 
 Developers must review all generated outputs before merging.
 
-### **6.3 Governance Requirements**
+### **3.3 Governance Requirements**
 
 * Architecture decisions logged as ADRs
 * No undocumented design deviations
 * Constitution must guide every service and artifact
 
-### **6.4 Branching & Versioning**
+### **3.4 Branching & Versioning**
 
 ```
 feature/US001-short-description
@@ -227,7 +137,7 @@ feature/US002-short-description
 * Minor → backward-compatible enhancements
 * Major → breaking changes
 
-### **6.5 CI/CD Requirements**
+### **3.5 CI/CD Requirements**
 
 * Automated lint, test, security, dependency scanning
 * Branch Protection rules enforced
@@ -235,7 +145,7 @@ feature/US002-short-description
 
 ---
 
-## **7. Quality Gates**
+## **4. Quality Gates**
 
 Every merge request must include:
 
@@ -249,15 +159,15 @@ No exceptions.
 
 ---
 
-## **8. Observability & Operations**
+## **5. Observability & Operations**
 
-### **8.1 Required Telemetry**
+### **5.1 Required Telemetry**
 
 * Logs → structured JSON
 * Metrics → latency, error rate, throughput
 * Traces → service-to-service spans
 
-### **8.2 Error Handling & Monitoring**
+### **5.2 Error Handling & Monitoring**
 
 * Centralized logging
 * Alerts for SLO violations
@@ -265,7 +175,7 @@ No exceptions.
 
 ---
 
-## **9. Security & Compliance**
+## **6. Security & Compliance**
 
 * Validate all inputs
 * Sanitize outputs
@@ -281,42 +191,42 @@ Data Protection:
 
 ---
 
-## **10. Documentation Framework**
+## **7. Documentation Framework**
 
-### **10.1 docs/inputs/**
+### **7.1 docs/inputs/**
 
 Raw business requirements, diagrams, meeting notes.
 
-### **10.2 docs/specs/**
+### **7.2 docs/specs/**
 
 AI-refined specifications (single source of truth).
 
-### **10.3 docs/plan/**
+### **7.3 docs/plan/**
 
 High-level delivery strategy.
 
-### **10.4 docs/tasks/**
+### **7.4 docs/tasks/**
 
 User stories + task breakdown for implementation.
 
-### **10.5 docs/adr/**
+### **7.5 docs/adr/**
 
 Architectural decisions and rationale.
 
-### **10.6 constitution.md**
+### **7.6 constitution.md**
 
 This file—governing everything.
 
 ---
 
-## **11. Compliance with This Constitution**
+## **8. Compliance with This Constitution**
 
 All contributors—human and AI—must adhere to the constitution.
 Deviations must be explicitly approved through an ADR process.
 
 ---
 
-## **12. Future Evolution**
+## **9. Future Evolution**
 
 This constitution will evolve as:
 
