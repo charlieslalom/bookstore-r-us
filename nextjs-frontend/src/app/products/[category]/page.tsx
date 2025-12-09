@@ -14,14 +14,15 @@ async function getProducts(category: string) {
     }
 }
 
-export default async function CategoryPage({ params }: { params: { category: string } }) {
-    const products = await getProducts(params.category);
+export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+    const { category } = await params;
+    const products = await getProducts(category);
 
     return (
         <div className="flex min-h-screen flex-col">
             <Navbar />
             <main className="container py-8 flex-1">
-                <h1 className="text-3xl font-bold tracking-tight mb-8 capitalize">{params.category}</h1>
+                <h1 className="text-3xl font-bold tracking-tight mb-8 capitalize">{category}</h1>
 
                 {products.length === 0 ? (
                     <div className="text-center py-20 text-muted-foreground">
@@ -29,7 +30,7 @@ export default async function CategoryPage({ params }: { params: { category: str
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {products.map((p: any) => <ProductCard key={p.id.asin || p.id} product={p} />)}
+                        {products.map((p: any) => <ProductCard key={p.asin || p.id?.asin || p.id} product={p} />)}
                     </div>
                 )}
             </main>

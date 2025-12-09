@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import py_eureka_client.eureka_client as eureka_client
 import os
-from .routers import proxy
+from routers import proxy
 
 # Configuration
 EUREKA_SERVER = os.getenv("EUREKA_URI", "http://localhost:8761/eureka")

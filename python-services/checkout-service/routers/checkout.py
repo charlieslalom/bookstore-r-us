@@ -5,8 +5,8 @@ from datetime import datetime
 import uuid
 import os
 from typing import Dict, Any
-from ..database import get_session
-from ..models import Order, ProductInventory
+from database import get_session
+from models import Order, ProductInventory
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/checkout-microservice", tags=["checkout"])

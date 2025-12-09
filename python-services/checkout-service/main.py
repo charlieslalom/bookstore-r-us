@@ -3,8 +3,8 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import py_eureka_client.eureka_client as eureka_client
 import os
-from .database import create_db_and_tables
-from .routers import checkout
+from database import create_db_and_tables
+from routers import checkout
 
 # Configuration
 EUREKA_SERVER = os.getenv("EUREKA_URI", "http://localhost:8761/eureka")

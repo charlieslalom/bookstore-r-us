@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select, col
 from datetime import datetime
 from typing import Dict, List, Optional
-from ..database import get_session
-from ..models import ShoppingCart
+from database import get_session
+from models import ShoppingCart
 
 router = APIRouter(prefix="/cart-microservice", tags=["cart"])
 
