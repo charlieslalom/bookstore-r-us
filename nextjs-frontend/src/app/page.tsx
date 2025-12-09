@@ -28,24 +28,24 @@ export default async function Home() {
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="bg-muted py-12 md:py-24 lg:py-32">
+        {/* Hero Section - X.com inspired */}
+        <section className="py-16 md:py-24 lg:py-32 border-b border-border">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+            <div className="flex flex-col items-center space-y-6 text-center">
+              <div className="space-y-4">
+                <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
                   Your Favorite Bookstore, <span className="text-primary">Reimagined.</span>
                 </h1>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
+                <p className="mx-auto max-w-[700px] text-muted-foreground text-lg md:text-xl">
                   Discover the best books, music, and electronics. Secure, fast, and built for you.
                 </p>
               </div>
-              <div className="space-x-4">
+              <div className="flex gap-4">
                 <Link href="/products/Books">
-                  <Button size="lg">Shop Books</Button>
+                  <Button size="lg" className="font-bold px-8">Shop Books</Button>
                 </Link>
                 <Link href="/register">
-                  <Button variant="outline" size="lg">Join Now</Button>
+                  <Button variant="outline" size="lg" className="font-bold px-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground">Join Now</Button>
                 </Link>
               </div>
             </div>
@@ -53,12 +53,12 @@ export default async function Home() {
         </section>
 
         {/* Bestsellers Section */}
-        <section className="container py-12 space-y-12">
+        <section className="container py-12 space-y-16">
           {books.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold tracking-tight">Best Sellers in Books</h2>
-                <Link href="/products/Books" className="flex items-center text-primary hover:underline">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-border pb-4">
+                <h2 className="text-xl font-extrabold tracking-tight">Best Sellers in Books</h2>
+                <Link href="/products/Books" className="flex items-center text-primary font-semibold hover:underline">
                   View all <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </div>
@@ -69,10 +69,10 @@ export default async function Home() {
           )}
 
           {music.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold tracking-tight">Top Music</h2>
-                <Link href="/products/Music" className="flex items-center text-primary hover:underline">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-border pb-4">
+                <h2 className="text-xl font-extrabold tracking-tight">Top Music</h2>
+                <Link href="/products/Music" className="flex items-center text-primary font-semibold hover:underline">
                   View all <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </div>
@@ -83,10 +83,10 @@ export default async function Home() {
           )}
 
           {electronics.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold tracking-tight">Electronics & Gadgets</h2>
-                <Link href="/products/Electronics" className="flex items-center text-primary hover:underline">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-border pb-4">
+                <h2 className="text-xl font-extrabold tracking-tight">Electronics & Gadgets</h2>
+                <Link href="/products/Electronics" className="flex items-center text-primary font-semibold hover:underline">
                   View all <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </div>
@@ -97,9 +97,9 @@ export default async function Home() {
           )}
         </section>
       </main>
-      <footer className="py-6 md:px-8 md:py-0">
-        <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-          <p className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
+      <footer className="border-t border-border py-8 md:px-8">
+        <div className="container flex flex-col items-center justify-between gap-4 md:h-16 md:flex-row">
+          <p className="text-sm text-muted-foreground">
             Built by Antigravity. Source code available on GitHub.
           </p>
         </div>
