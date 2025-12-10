@@ -23,7 +23,6 @@
 hs_err_pid*
 
 # npm
-package-lock.json
 /.project
 .direnv
 .idea
