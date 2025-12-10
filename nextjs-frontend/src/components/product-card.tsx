@@ -24,11 +24,19 @@ export function ProductCard({ product }: { product: Product }) {
         <Card className="flex flex-col h-full overflow-hidden transition-all hover:border-primary/50 rounded-xl">
             <Link href={`/product/${asin}`} className="flex-1">
                 <div className="aspect-[3/4] overflow-hidden relative group bg-secondary">
-                    <img
-                        src={imageUrl}
-                        alt={product.title}
-                        className="object-cover w-full h-full transition-transform group-hover:scale-105"
-                    />
+                    {imageUrl ? (
+                        <img
+                            src={imageUrl}
+                            alt={product.title}
+                            className="object-cover w-full h-full transition-transform group-hover:scale-105"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary to-muted">
+                            <span className="text-muted-foreground text-4xl font-bold opacity-20">
+                                {product.category.charAt(0)}
+                            </span>
+                        </div>
+                    )}
                 </div>
             </Link>
             <CardContent className="p-4">
