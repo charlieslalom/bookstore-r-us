@@ -1,0 +1,80 @@
+# Version control
+.git/
+.gitignore
+.github/
+
+# Documentation
+README.md
+*.md
+docs/
+examples/
+transcripts/
+
+# IDE and editor files
+.vscode/
+.idea/
+.cursor/
+.claude/
+*.swp
+*.swo
+*~
+
+# Build artifacts (Java)
+target/
+*.class
+*.jar
+*.war
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.coverage
+
+# Logs
+*.log
+*.out
+bootstrap.log
+
+# Environment files
+.env*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test and coverage
+coverage/
+.nyc_output/
+test-results/
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+.direnv
+
+# Assets and resources (optional - uncomment if needed)
+# assets/
+# resources/
